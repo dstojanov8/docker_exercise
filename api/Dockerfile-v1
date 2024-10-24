@@ -1,0 +1,47 @@
+# First layer, parent image, pulls it from Docker repsitory.
+# It is the base for the image we are creating.
+FROM node:17-alpine
+
+# This instruction tells docker, when we run commands or when we specify paths in the image 
+# after this instruction, to do it from this working directory (are relative to it).
+# - now when a command (like "npm install") is run it wil do it from inside app folder
+# - keep in mind that now even the COPY instruction will use this working directory path as
+#   relative to copy to.
+WORKDIR /app
+
+COPY package.json .
+
+RUN npm install
+
+# Copying the source code into the image
+# First . is the relative path to the directory we want to copy our source file from.
+# - since the source files are in the same root directory as the Dockerfile the
+#   path is a single dot, meaning the current directory.
+# - if all of out code was in a src folder our path would be ./src
+# Second . is the path inside the image what we want to copy our source code (files) to.
+# - images have to have their own folder structure, dot means copy to the root directory
+#   of the image we are creating.
+# - usually we don't want to copy into root directory, it might clash with other files or
+#   folders, insted we should copy to a path (ex. COPY . /app)
+# - NOW that WOKDIR is specified, if we use the ex. (above) the path will be /app/app, we 
+#   should insead just use (COPY . .) => copy to root directory relative to wokring directory
+COPY . .
+
+# Installing dependencies (after files were copied)
+# - one small problem, the command is going to be ran inside root directory of the image.
+# - our package.json file is copied into app folder (command wont find our file in root)
+# - in order to work we need to run the command in the same directory as our package.json
+# - the way we do that is by specifying a working directory for the image(second instruction)
+#* moved command above to optimize layer caching
+#* RUN npm install
+# RUN commands are run while the image is being built (at build time)!
+
+# EXPOSE instruction tells docker which port the continer should expose, same port as in app.js
+EXPOSE 4000
+# required for docker desktop port mapping, we will map this port 4000 to some other port
+# which we will use to access the application in the browser
+
+# Command to run the application in the container (it is an array with strings)
+# CMD allows us to specify any commands that should be run in run time!
+# This will spin up our application inside the container
+CMD ["node", "app.js"]
