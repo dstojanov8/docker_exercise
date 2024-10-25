@@ -2,10 +2,10 @@
 
 Builds (makes) images and runs them to create containers based on the confuguration provided in docker-compose.yml file.
 
-`docker-compose up` -> run docker-compose file to start start the container
+`docker-compose up` - run docker-compose file to start start the container
 
-`docker-compose down` -> stops the container and delets it, image and volumes will remain
--> if we add `--rmi all -v` flags in this command image and volumes will be removed as well
+`docker-compose down` - stops the container and delets it, image and volumes will remain
+- if we add `--rmi all -v` flags in this command image and volumes will be removed as well
 
 ## Check docker-compose.yml file. Explanation of volumes
 
