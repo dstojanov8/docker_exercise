@@ -9,8 +9,11 @@ Builds (makes) images and runs them to create containers based on the confugurat
 
 ## Check docker-compose.yml file. Explanation of volumes
 
-- ./api:/app
-- /app/node_modules
+```
+volumes:
+  - ./api:/app
+  - /app/node_modules
+```
 
 1. `./api:/app`: This maps the `./api` directory from your host machine to `/app` inside the container, making any changes in your local `api` folder visible inside the container.
 
