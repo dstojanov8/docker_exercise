@@ -57,9 +57,9 @@ During development, we can use volumes to map our project folder to a container 
 ex.
 `docker run --name myapp_c_nodemon -p 3000:4000 --rm -v "C:\Users\dimitrije\Desktop\Docker Course\api:/app" -v /app/node_modules myapp:nodemon`
 
-`-v "C:\Users\dimitrije\Desktop\Docker Course\api:/app"` -> volume to map out project folder
+- `-v "C:\Users\dimitrije\Desktop\Docker Course\api:/app"` -> volume to map out project folder
 
-`-v /app/node_modules` -> anonymous volume for node_modules
+- `-v /app/node_modules` -> anonymous volume for node_modules
 
 `docker run --name <c_name> -p <comp_port>:<cont_port> -d --rm -v <project_path>:<container_path> <i_name/i_id>`
 
