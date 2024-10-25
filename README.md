@@ -9,36 +9,39 @@ change something in our code we need to create a new image.
 
 First Navigate to api directory (direcroty where Dockerfile is located)
 
-`docker build -t <image_name> .` -> run to create a new image, -t to tag (give the image a name)
--> we use . as a relative path to the Dockerfile from our directory
-`docker build -t <image_name>:<tag_name> .` -> we can specify tag name (version) of the image (this is optional)
--> we do need to use both (image_name:tag_name) when creating a new container with this image
+`docker build -t <image_name> .` - run to create a new image, -t to tag (give the image a name)
+- we use . as a relative path to the Dockerfile from our directory
+  
+`docker build -t <image_name>:<tag_name> .` - we can specify tag name (version) of the image (this is optional)
+- we do need to use both (image_name:tag_name) when creating a new container with this image
 
-`docker images` -> lists all docker images (here we get the name (repository) and the image id)
+`docker images` - lists all docker images (here we get the name (repository) and the image id)
 
 `docker run --name <container_name> -p <comp_port>:<cont_port> -d --rm <image_name/image_id>`
--> runs an image and creates + STARTS the container, we specify the container name `--name` that is <container_name>
--> the image name/id which we are using that is <image_name/image_id>
--> we specify the port `-p` <comp_port> is port on out computer that is mapped to <cont_port> port exposed by the container
--> use `-d` to detach the terminal from the container process (we will be able to use the terminal)
--> use `-rm` to remove/delete the container once we stop it later on
+- runs an image and creates + STARTS the container, we specify the container name `--name` that is <container_name>
+- the image name/id which we are using that is <image_name/image_id>
+- we specify the port `-p` <comp_port> is port on out computer that is mapped to <cont_port> port exposed by the container
+- use `-d` to detach the terminal from the container process (we will be able to use the terminal)
+- use `-rm` to remove/delete the container once we stop it later on
 
-`docker ps` -> shows us a list of running containers
-`docker ps -a` -> shows us a list of all docker containers
+`docker ps` - shows us a list of running containers
 
-`docker start <container_name/container_id>` -> just STARTS the container, without creating a new one
--> no port configuration needed or `-d` if it is specified during the container creation process
+`docker ps -a` - shows us a list of all docker containers
 
-`docker stop <container_name/container_id>` -> stops the container with the specified name/id
+`docker start <container_name/container_id>` - just STARTS the container, without creating a new one
+- no port configuration needed or `-d` if it is specified during the container creation process
 
-`docker image rm <image_name/image_id>` -> delete an image with specified name/id
--> will only work if the image is not used by any container
-`docker image rm <image_name/image_id> -f` -> will force delete an image with specified name/id
--> we can also first delete the container that uses the image and then the image itself
+`docker stop <container_name/container_id>` - stops the container with the specified name/id
 
-`docker container rm <container_name/container id>` -> delete container with name/id
+`docker image rm <image_name/image_id>` - delete an image with specified name/id
+- will only work if the image is not used by any container
 
-`docker system prune -a` -> delete all images, containers and volumes
+`docker image rm <image_name/image_id> -f` - will force delete an image with specified name/id
+- we can also first delete the container that uses the image and then the image itself
+
+`docker container rm <container_name/container id>` - delete container with name/id
+
+`docker system prune -a` - delete all images, containers and volumes
 
 ## Docker Volumes
 
