@@ -1,0 +1,9 @@
+services:
+  api:
+    build: ./api # path to Dockerfile
+    container_name: api_c
+    ports: # list of values, we can have more than one
+      - "3000:4000" # mapping the ports just like we did in `docker run` command
+    volumes: # list of volumes, we can have more than one
+      - ./api:/app # creating a volume to map the api folder to (:) app folder in container
+      - /app/node_modules # just like before, we are mapping the folder from the container to our host machine
