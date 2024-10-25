@@ -3,7 +3,17 @@ services:
     build: ./api # path to Dockerfile
     container_name: api_c
     ports: # list of values, we can have more than one
-      - "3000:4000" # mapping the ports just like we did in `docker run` command
+      - "3000:4000" # mapping the ports just like we did in `docker run` command (in browser we go to 3000)
     volumes: # list of volumes, we can have more than one
       - ./api:/app # creating a volume to map the api folder to (:) app folder in container
       - /app/node_modules # just like before, we are mapping the folder from the container to our host machine
+
+  myblog:
+    build: ./myblog
+    container_name: myblog_c
+    ports:
+      - "2000:3000" # mapping the ports (in the bworser we go to 2000 to access the container)
+    # volumes:
+    #   - ./myblog:/app # we can add volumes to the container but check how it works if we have two volumes
+    stdin_open: true # WE NEED these two properties in order for React app to work
+    tty: true # Starts the container in interactive mode, what we should do with React Apps in docker

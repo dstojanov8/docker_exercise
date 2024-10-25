@@ -1,87 +1,40 @@
-# Docker Image Overview
+# Project Overview
 
-Every (almost) line we write inside the Dockerfile represents a new layer in the image we are creating.
-First layer we pull in the parent image and so on... This is how the images are being build. Layers being
-stacked on top of each other. Images are read only, they dont automatically update after changes. If we
-change something in our code we need to create a new image.
+Small exercise to see how **_Docker_** and **_docker-compose_** works.
 
-## Docker commands
+- In the _/api_ directory there is a simple backend app made with Node's **Express** framework. This app exposes an **API** on `port 4000`, a **GET ('/')** request, returning a list of objects with an `id` and a `title`.
+- In the _/myblog_ directory, there is a simple frontend **React** app, which fetches and displays the objects received from the backend. The React app runs on `port 3000`.
 
-First Navigate to api directory (direcroty where Dockerfile is located)
+In **Dockerfiles** that are placed inside the two app directories, _ports 4000_ and _3000_ are **exposed** respectively, as these are the ports each app uses inside its container. The **docker-compose.yml** file maps these internal container ports to ports accessible outside the container.
 
-`docker build -t <image_name> .` - run to create a new image, -t to tag (give the image a name)
-- we use . as a relative path to the Dockerfile from our directory
-  
-`docker build -t <image_name>:<tag_name> .` - we can specify tag name (version) of the image (this is optional)
-- we do need to use both (image_name:tag_name) when creating a new container with this image
+- In the case of our backend, we are mapping the `port 4000` (internal) to `3000` (external). Since the container that will be runnung our frontend app will make a request to the backend we are sending that request to `port 3000`, as it is the one that will be used outside the container.
+- In the case of our frontend, we are mapping the `port 3000` (internal) to `2000` (external), and to access the app in our browser will will need to go to `http://localhost:2000/`, as `port 2000` will be used outside the container.
 
-`docker images` - lists all docker images (here we get the name (repository) and the image id)
+_For example and information on docker-compose check the `.yml` file_
+**For more information about Dockerfile and now Docker works please go to /api/README.md and Dockerfile-v1 and Dockerfile**
 
-`docker run --name <container_name> -p <comp_port>:<cont_port> -d --rm <image_name/image_id>`
-- runs an image and creates + STARTS the container, we specify the container name `--name` that is <container_name>
-- the image name/id which we are using that is <image_name/image_id>
-- we specify the port `-p` <comp_port> is port on out computer that is mapped to <cont_port> port exposed by the container
-- use `-d` to detach the terminal from the container process (we will be able to use the terminal)
-- use `-rm` to remove/delete the container once we stop it later on
+# Docker Compose Overview
 
-`docker ps` - shows us a list of running containers
+Builds (makes) images and runs them to create containers based on the confuguration provided in docker-compose.yml file.
 
-`docker ps -a` - shows us a list of all docker containers
+`docker-compose up` - run docker-compose file to start start the container
 
-`docker start <container_name/container_id>` - just STARTS the container, without creating a new one
-- no port configuration needed or `-d` if it is specified during the container creation process
+`docker-compose down` - stops the container and delets it, image and volumes will remain
 
-`docker stop <container_name/container_id>` - stops the container with the specified name/id
+- if we add `--rmi all -v` flags in this command image and volumes will be removed as well
 
-`docker image rm <image_name/image_id>` - delete an image with specified name/id
-- will only work if the image is not used by any container
+## Check docker-compose.yml file. Explanation of volumes
 
-`docker image rm <image_name/image_id> -f` - will force delete an image with specified name/id
-- we can also first delete the container that uses the image and then the image itself
+```
+volumes:
+  - ./api:/app
+  - /app/node_modules
+```
 
-`docker container rm <container_name/container id>` - delete container with name/id
+1. `./api:/app`: This maps the `./api` directory from your host machine to `/app` inside the container, making any changes in your local `api` folder visible inside the container.
 
-`docker system prune -a` - delete all images, containers and volumes
+2. `/app/node_modules`: This creates an anonymous volume in Docker, which means:
 
-## Docker Volumes
-
-Are a feature on docker that alows us to specify folders on our host computer that can be made available to running containers.
-We can map those folders on our host computer to specific folders inside the container, so that if something changed in those folders
-on our computer that change can also be reflected in the folders we mapped to in the container.
-
-We can use volumes during developmnet to map our project folder to container volume. Once done every change in our sorce code will be
-reflected in the container. The issue is that now if we do have a node_modules folder inside our app folder and we delete it it will be
-reflected in the container. SOLUTION: adding an anonymous volume.
-
-ANONYMUS volumes map the containers folder (in this case node_modules) to somewhere else on the host machine (all managed by docker).
-in the exmple below `/app/node_modules` specifies the location of folder inside the container itself when it is running. We don't map it
-to any specific folder on our computer, docker maps it on its own. Contents of that folder will PERSIST even after the container STOPS.
-The next time the same container starts again we will have those values.
-
-ex.
-`docker run --name myapp_c_nodemon -p 3000:4000 --rm -v "C:\Users\dimitrije\Desktop\Docker Course\api:/app" -v /app/node_modules myapp:nodemon`
-`-v "C:\Users\dimitrije\Desktop\Docker Course\api:/app"` -> volume to map out project folder
-`-v /app/node_modules` -> anonymous volume for node_modules
-
-`docker run --name <c_name> -p <comp_port>:<cont_port> -d --rm -v <project_path>:<container_path> <i_name/i_id>`
--> `<project_path>` is an aboslute path to our project (right click on the project and get path)
--> `<container_path>` is where we want to map this folder to in the container
-
-## Layer Caching
-
-Every time docker tries to build an image and walks through different layers, its stores each layer of our (new) image in cache.
-The first time we build the image, after each layer, docker took our (new) image in that point in time and stored in the cache.
-When we build the image again, before docker starts the build process from scratch, it looks in our cache and tries to find the
-image in our cache that it can use for the new image we are creating. Once Docker finds a layer that has chaged it no loner uses
-cached information. A good way to optimize this is to add more individual COPY layers so we can cache RUN commands as well.
-
-### Additional pointers
-
-1. Check Dockerfile for explanations of eact instruction
-
-2. It is best not tu run `npm install` on local machine
-   (COPY . .) command will, in that case, copy node_modules folder as well
-   (RUN ...) command will replace the existing
-   This can cause problems with package versions and COPY command will take more time
-
-   If we do have a node_modules folder on local machine than put it in `.dockerignore`
+- Docker will store the data for `/app/node_modules` outside the container's writable layer.
+- This anonymous volume does not map to any specific folder on your host (unlike ./api:/app).
+- Docker uses this to ensure that any files in `/app/node_modules` inside the container are isolated and not overwritten by the host.
